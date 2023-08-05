@@ -1,0 +1,20 @@
+body {
+    background-image: url(/img/background.jpg);
+    margin:0;
+}
+model-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    padding: 0;
+    z-index: 1;
+}
+
+.control-container {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+}
