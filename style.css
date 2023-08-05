@@ -13,7 +13,7 @@ model-viewer {
     z-index: 1;
 }
 
-model-viewer > button.ar-button.btn {
+model-viewer .ar-button.btn {
     position: fixed;
     bottom: 10px;
     left: 10px;
