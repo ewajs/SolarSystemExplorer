@@ -15,7 +15,7 @@ model-viewer {
 
 model-viewer .ar-button.btn {
     position: fixed;
-    bottom: 10px;
+    bottom: 70px;
     left: 10px;
 }
 
