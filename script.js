@@ -316,12 +316,37 @@ document.getElementById('share').addEventListener('click', (e) => {
         navigator.share(shareData);
         return;
     }
+
+    const shareTextContent = 'Copiá el link o escaneá el QR';
+    const successCopyText = 'Copiado!';
     // Otherwhise modal with a link + QR
-     // If user cannot use AR here, we prompt them to view in mobile device
-     launchModal(
+    // If user cannot use AR here, we prompt them to view in mobile device
+    launchModal(
         'Compartir',
-        '<div id="qr-code"></div>',
+        `<div class="share-container">
+            <p class="share-text">${shareTextContent}</p>
+            <div class="share-link"><a href="#">${window.location.href}</a><i class="bi bi-clipboard"></i></div>
+            <div id="qr-code"></div>
+        </div>`,
+        'share-modal'
     );
+
+    const shareLink = document.querySelector('.share-link');
+    const shareText = document.querySelector('.share-text');
+
+    shareLink.addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href);
+        const bi = shareLink.querySelector('.bi');
+        bi.classList.remove('bi-clipboard');
+        bi.classList.add('bi-clipboard-check');
+        shareText.innerText = successCopyText;
+        // Reset back after a while
+        setTimeout(() => {
+            shareText.innerText = shareTextContent;
+            bi.classList.remove('bi-clipboard-check');
+            bi.classList.add('bi-clipboard');
+        }, 2000)
+    });
 
     new QRCode(document.getElementById('qr-code'), {
         text: window.location.href,
@@ -330,5 +355,5 @@ document.getElementById('share').addEventListener('click', (e) => {
         colorDark : '#202327',
         colorLight : '#e1e5eb',
         correctLevel : QRCode.CorrectLevel.H
-      });
+    });
 })
