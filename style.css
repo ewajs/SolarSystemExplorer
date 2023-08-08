@@ -82,3 +82,31 @@ model-viewer .ar-button.btn {
 .dropend > .dropdown-menu > li > .dropdown-item:not(.active) > .bi-check-circle-fill {
     display: none;
 }
+
+/* QR Modal */
+#qr-code {
+    display: flex;
+    justify-content: center;
+}
+
+.swal2-container > .swal2-modal {
+    background-color: #343a40;
+}
+
+.swal2-container > .swal2-modal .swal2-title {
+    color: white;
+}
+
+.swal2-container > .swal2-modal .btn{
+    color: #343a40;
+    background-color: white;
+}
+
+.swal2-container > .swal2-modal .btn:focus{
+    box-shadow: unset;
+}
+
+.swal2-container > .swal2-modal .btn:hover{
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+}

@@ -58,5 +58,20 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
         modelViewer.querySelector('.ar-button').click();
         return;
     }
-    console.log("AR Inactive!")
+    Swal.fire({
+        title: 'Abrílo en tu celular para verlo en Realidad Aumentada',
+        html: '<div id="qr-code"></div>',
+        confirmButtonText: 'OK!',
+        customClass: {
+            confirmButton: 'btn',
+        }
+    });
+    const qrcode = new QRCode(document.getElementById('qr-code'), {
+        text: window.location.href,
+        width: 256,
+        height: 256,
+        colorDark : '#202327',
+        colorLight : '#e1e5eb',
+        correctLevel : QRCode.CorrectLevel.H
+      });
 });
