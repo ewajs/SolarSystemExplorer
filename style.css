@@ -15,7 +15,7 @@ model-viewer {
     z-index: 1;
 }
 
-model-viewer .ar-button.btn {
+model-viewer > button.ar-button {
   display: none;
 }
 
