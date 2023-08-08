@@ -3,7 +3,8 @@ const bodiesToModels = {
     earth: { 
         model: './models/earth.glb',
         mapImage: './textures/2k_earth.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 23.4, 
+        retrograde: false,
         data:  {
             name: 'Tierra',
             mass: '5,97×10^24 kg',
@@ -15,7 +16,8 @@ const bodiesToModels = {
     moon: { 
         model: './models/moon.glb',
         mapImage: './textures/2k_moon.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 1.5, 
+        retrograde: false,
         data:  {
             name: 'Luna',
             mass: '7,34×10^22 kg / 0.01 Tierras',
@@ -27,7 +29,8 @@ const bodiesToModels = {
     mercury: { 
         model: './models/mercury.glb',
         mapImage: './textures/2k_mercury.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 2,
+        retrograde: false, 
         data:  {
             name: 'Mercurio',
             mass: '3,30×10^23 kg / 0.06 Tierras',
@@ -39,7 +42,8 @@ const bodiesToModels = {
     venus: { 
         model: './models/venus.glb',
         mapImage: './textures/2k_venus.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 177.4, 
+        retrograde: true,
         data:  {
             name: 'Venus',
             mass: '4,86×10^24 kg / 0.81 Tierras',
@@ -51,7 +55,8 @@ const bodiesToModels = {
     mars: { 
         model: './models/mars.glb',
         mapImage: './textures/2k_mars.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        retrograde: false,
+        axialTilt: 25.2, 
         data:  {
             name: 'Marte',
             mass: '6,42×10^23 kg / 0.11 Tierras',
@@ -63,7 +68,8 @@ const bodiesToModels = {
     jupiter: { 
         model: './models/jupiter.glb',
         mapImage: './textures/2k_jupiter.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        retrograde: false,
+        axialTilt: 3.3, 
         data:  {
             name: 'Júpiter',
             mass: '1,90×10^27 kg / 317.8 Tierras',
@@ -75,7 +81,8 @@ const bodiesToModels = {
     saturn: { 
         model: './models/saturn.glb',
         mapImage: './textures/2k_saturn.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 26.7, 
+        retrograde: false,
         data:  {
             name: 'Saturno',
             mass: '5.68×10^26 kg / 95.2 Tierras',
@@ -86,7 +93,8 @@ const bodiesToModels = {
     uranus: { 
         model: './models/uranus.glb',
         mapImage: './textures/2k_uranus.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 97.8,
+        retrograde: true, 
         data:  {
             name: 'Urano',
             mass: '8.68×10^25 kg / 14.5 Tierras',
@@ -98,7 +106,8 @@ const bodiesToModels = {
     neptune: { 
         model: './models/neptune.glb',
         mapImage: './textures/2k_neptune.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 28.3,
+        retrograde: false, 
         data:  {
             name: 'Neptuno',
             mass: '1.02×10^26 kg / 17.1 Tierras',
@@ -110,7 +119,8 @@ const bodiesToModels = {
     sun: { 
         model: './models/sun.glb',
         mapImage: './textures/2k_sun.jpg',
-        axialTilt: '0deg 0deg 0deg', 
+        axialTilt: 7.25,
+        retrograde: false, 
         data:  {
             name: 'Sol',
             mass: '1.99×10^30 kg / 332.950 Tierras',
@@ -125,11 +135,12 @@ const modelViewer = document.querySelector('model-viewer');
 
 //// State
 let selectedBody = bodiesToModels.earth;
-let wasPaused = false;
+let isPaused = false, isTilted = false;
 let defaultCameraOrbit, defaultFieldOfView, loaderTimeout;
 
 //// State Updaters
 function loadModel(body) {
+    if (selectedBody.model === bodiesToModels[body].model) return; // Do nothing if already selected
     selectedBody = bodiesToModels[body];
     const params = new URLSearchParams();
     // update search params without triggering page load
@@ -213,7 +224,7 @@ document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.ad
     document.querySelector('#celestialBodies .dropdown-item.active')?.classList.remove('active');
     // Select myself and change model
     el.classList.add('active');
-    wasPaused = modelViewer.paused;
+    isPaused = modelViewer.paused;
     loadModel(el.dataset.body);
     closeDropdowns();
 }))
@@ -221,7 +232,9 @@ document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.ad
 // Model Changed Successfully
 modelViewer.addEventListener('load', () => {
     // Sync state
-    if(wasPaused) modelViewer.pause();
+    if(isPaused) modelViewer.pause();
+    modelViewer.orientation = `${isTilted ? -selectedBody.axialTilt : 0}deg 0deg 0deg`;
+    modelViewer.timeScale = selectedBody.retrograde ? -1 : 1;
     defaultCameraOrbit = modelViewer.getCameraOrbit();
     defaultFieldOfView = modelViewer.getFieldOfView();
     // Clear launching of modal and close if needed
@@ -254,8 +267,11 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
 // TODO: Compare Switch Model
 document.getElementById('compare').addEventListener('click', () => launchModal('No disponible! Estamos trabajando...'));
 
-// TODO: Tilt
-document.getElementById('axialTilt').addEventListener('toggle', () =>  console.error("NOT IMPLEMENTED"));
+// Axial Tilt
+document.getElementById('axialTilt').addEventListener('toggle', (e) => {
+    isTilted = e.detail;
+    modelViewer.orientation = `${isTilted ? -selectedBody.axialTilt : 0}deg 0deg 0deg`;
+});
 
 // Spin
 document.getElementById('spin').addEventListener('toggle', () => modelViewer.paused ? modelViewer.play() : modelViewer.pause());
