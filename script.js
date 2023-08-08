@@ -275,3 +275,33 @@ document.getElementById('map').addEventListener('click', () => {
         }
     })
 });
+
+// Help 
+document.getElementById('help').addEventListener('click', () => {
+    const innerHTML = `
+        <h1>Controles</h1>
+        <p><strong>Apuntar Cámara: </strong> Click / Tocar</p>
+        <p><strong>Rotar Cámara: </strong> Click + Arrastrar / Deslizar</p>
+        <p><strong>Zoom: </strong> Ruedita / Pellizcar</p>
+        <h1>Realidad Aumentada</h1>
+        <p><strong>Mover Modelo: </strong> Deslizar</p>
+        <p><strong>Rotar Modelo: </strong> Dos dedos + Rotar</p>
+        <p><strong>Zoomear Modelo: </strong> Pellizcar</p>
+        <h2>Créditos</h2>
+        <p class="credit"><strong>Texturas Cuerpos Celestes:</strong> <a href="https://www.solarsystemscope.com/textures/" target="_blank">Solar Textures</a></p>
+        <p class="credit"><strong>Modelado 3D hecho con:</strong> <a href="https://www.blender.org/" target="_blank">Blender</a></p>
+        <p class="credit"><strong>Información Astronómica:</strong> <a href="https://www.wikipedia.org/" target="_blank">Wikipedia</a></p>
+        <p class="credit"><strong>Hecho por:</strong> <a href="https://github.com/ewajs" target="_blank">Ezequiel Wajs</a></p>
+        <p class="credit"><strong>Asesoría Modelado y 3D:</strong> <a href="https://www.imdb.com/name/nm9137925/" target="_blank">Lionel Cornistein</a></p>
+    `;
+    
+    Swal.fire({
+        title: `Ayuda`,
+        html: innerHTML,
+        confirmButtonText: 'OK!',
+        customClass: {
+            container: 'help-modal',
+            confirmButton: 'btn',
+        }
+    })
+});
