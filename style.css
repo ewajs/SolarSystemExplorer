@@ -40,13 +40,9 @@ model-viewer .ar-button.btn {
 
 .dropdown .dropdown-item.disabled {
     opacity: 0.6;
-    pointer-events: none;
+    pointer-events: unset;
 }
 
-.menu-container .dropdown .dropend {
-    padding: 0;
-    border-radius: 0;
-}
 
 .menu-container .dropend > .dropdown-toggle,
 .menu-container .dropdown > .dropdown-toggle  {
@@ -54,6 +50,21 @@ model-viewer .ar-button.btn {
     display: flex;
     justify-content: space-between;
     padding: 4px 16px;
+    font-size: 20px;
+}
+
+.menu-container .dropend {
+    border-radius: 0;
+}
+
+.menu-container .dropend > .dropdown-toggle {
+    padding: 0;
+    border-radius: 0;
+}
+
+.menu-container .dropend > .dropdown-toggle:active,
+.menu-container .dropend > .dropdown-toggle.btn {
+    border: none;
 }
 
 .menu-container .dropend > .dropdown-toggle::after,
@@ -64,11 +75,13 @@ model-viewer .ar-button.btn {
 .menu-container #mainMenu .dropdown-item {
     display: flex;
     justify-content: space-between;
+    font-size: 20px;
 }
 
 .dropend > .dropdown-menu > li > .dropdown-item {
     display: flex;
     justify-content: space-between;
+    font-size: 20px;
 }
 
 .dropend > .dropdown-menu > li > .dropdown-item.active {

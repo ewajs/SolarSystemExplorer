@@ -12,6 +12,7 @@ const bodiesToModels = {
 }
 
 const modelViewer = document.querySelector('model-viewer');
+
 let wasPaused = false;
 modelViewer.addEventListener('load', () => {
     if(wasPaused) modelViewer.pause();
@@ -56,8 +57,16 @@ document.querySelectorAll('.dropdown-item.toggle').forEach(el => {
     });
 });
 
-document.getElementById('axialTilt').addEventListener('toggle', () => console.error("NOT IMPLEMENTED!"));
+document.getElementById('axialTilt').addEventListener('toggle', () =>  Swal.fire({
+        title: 'Ya viene! Estamos trabajando en esto...',
+        confirmButtonText: 'OK!',
+        customClass: {
+            confirmButton: 'btn',
+        }
+    })
+);
 document.getElementById('spin').addEventListener('toggle', () => modelViewer.paused ? modelViewer.play() : modelViewer.pause());
+document.getElementById('center').addEventListener('click', () => modelViewer.cameraTarget = "0m 0m 0m")
 document.getElementById('viewInAR').addEventListener('click', (e) => {
     if(modelViewer.canActivateAR) {
         modelViewer.querySelector('.ar-button').click();
