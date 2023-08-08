@@ -12,12 +12,17 @@ const bodiesToModels = {
 }
 
 const modelViewer = document.querySelector('model-viewer');
+let wasPaused = false;
+modelViewer.addEventListener('load', () => {
+    if(wasPaused) modelViewer.pause();
+})
 
 document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.addEventListener('click', () => {
     // Unselect selected
     document.querySelector('#celestialBodies .dropdown-item.active')?.classList.remove('active');
     // Select myself and change model
     el.classList.add('active');
+    wasPaused = modelViewer.paused;
     modelViewer.src = bodiesToModels[el.dataset.body].model;
 }))
 
