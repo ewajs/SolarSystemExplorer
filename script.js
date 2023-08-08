@@ -1,6 +1,8 @@
+//// Data
 const bodiesToModels = {
     earth: { 
-        model: './models/earth.glb', 
+        model: './models/earth.glb',
+        mapImage: './textures/2k_earth.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Tierra',
@@ -11,7 +13,8 @@ const bodiesToModels = {
         }
     },
     moon: { 
-        model: './models/moon.glb', 
+        model: './models/moon.glb',
+        mapImage: './textures/2k_moon.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Luna',
@@ -22,7 +25,8 @@ const bodiesToModels = {
         }
     },
     mercury: { 
-        model: './models/mercury.glb', 
+        model: './models/mercury.glb',
+        mapImage: './textures/2k_mercury.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Mercurio',
@@ -33,7 +37,8 @@ const bodiesToModels = {
         }
     },
     venus: { 
-        model: './models/venus.glb', 
+        model: './models/venus.glb',
+        mapImage: './textures/2k_venus.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Venus',
@@ -44,7 +49,8 @@ const bodiesToModels = {
         }
     },
     mars: { 
-        model: './models/mars.glb', 
+        model: './models/mars.glb',
+        mapImage: './textures/2k_mars.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Marte',
@@ -55,7 +61,8 @@ const bodiesToModels = {
         } 
     },
     jupiter: { 
-        model: './models/jupiter.glb', 
+        model: './models/jupiter.glb',
+        mapImage: './textures/2k_jupiter.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Júpiter',
@@ -66,7 +73,8 @@ const bodiesToModels = {
         } 
     },
     saturn: { 
-        model: './models/saturn.glb', 
+        model: './models/saturn.glb',
+        mapImage: './textures/2k_saturn.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Saturno',
@@ -76,7 +84,8 @@ const bodiesToModels = {
             revolutionTime: '29.45 años',
         }  },
     uranus: { 
-        model: './models/uranus.glb', 
+        model: './models/uranus.glb',
+        mapImage: './textures/2k_uranus.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Urano',
@@ -87,7 +96,8 @@ const bodiesToModels = {
         } 
     },
     neptune: { 
-        model: './models/neptune.glb', 
+        model: './models/neptune.glb',
+        mapImage: './textures/2k_neptune.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Neptuno',
@@ -98,7 +108,8 @@ const bodiesToModels = {
         } 
     },
     sun: { 
-        model: './models/sun.glb', 
+        model: './models/sun.glb',
+        mapImage: './textures/2k_sun.jpg',
         axialTilt: '0deg 0deg 0deg', 
         data:  {
             name: 'Sol',
@@ -109,49 +120,55 @@ const bodiesToModels = {
     },
 }
 
+//// Global References
 const modelViewer = document.querySelector('model-viewer');
-const infoButton = document.getElementById('info');
-let selectedBodyData = bodiesToModels.earth.data;
+
+//// State
+let selectedBody = bodiesToModels.earth;
 let wasPaused = false;
 let defaultCameraOrbit, defaultFieldOfView;
-modelViewer.addEventListener('load', () => {
-    if(wasPaused) modelViewer.pause();
-    defaultCameraOrbit = modelViewer.getCameraOrbit();
-    defaultFieldOfView = modelViewer.getFieldOfView();
+
+//// State Updaters
+function loadModel(body) {
+    selectedBody = bodiesToModels[body];
+    modelViewer.src = selectedBody.model;
+    const params = new URLSearchParams();
+    // update search params without triggering page load
+    params.set('body', body)
+    history.pushState(null, '', window.location.pathname + '?' + params.toString());
+}
+
+//// Events
+// Model Select on Page Load 
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    // Read from URL or default to earth if empty or invalid
+    const queryBody = params.get('body') ?? 'earth';
+    const body = bodiesToModels[queryBody] ? queryBody :'earth';
+    // Load from Map and default to earth if not found
+    loadModel(body);
 })
-
-document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.addEventListener('click', () => {
-    // Unselect selected
-    document.querySelector('#celestialBodies .dropdown-item.active')?.classList.remove('active');
-    // Select myself and change model
-    el.classList.add('active');
-    wasPaused = modelViewer.paused;
-    modelViewer.src = bodiesToModels[el.dataset.body].model;
-    selectedBodyData = bodiesToModels[el.dataset.body].data;
-}))
-
-// Dropdowns 
+// Dropdowns (General Behavior) 
 document.querySelectorAll('.dropdown, .dropend').forEach(dropdown => {
-    console.log("Configuring!")
     const toggle = dropdown.querySelector('.dropdown-toggle > .bi');
-    console.log({toggle, dropdown});
     // Active Icon
     dropdown.addEventListener('shown.bs.dropdown', (e) => {
-        if (toggle.parentElement !== e.target) return; // Not me (for some reason these fire for all dropdowns)
+        if (toggle.parentElement !== e.target) return; // Do nothing if not myself (for some reason these fire for all dropdowns)
         toggle.classList.remove(dropdown.dataset.inactiveIcon);
         toggle.classList.add(dropdown.dataset.activeIcon);
     });
 
     dropdown.addEventListener('hidden.bs.dropdown', (e) => {
-        if (toggle.parentElement !== e.target) return; // Not me (for some reason these fire for all dropdowns)
+        if (toggle.parentElement !== e.target) return; // Do nothing if not myself (for some reason these fire for all dropdowns)
         toggle.classList.add(dropdown.dataset.inactiveIcon);
         toggle.classList.remove(dropdown.dataset.activeIcon);
     });
     
 });
 
-// Toggles
+// Toggles (General Behavior)
 document.querySelectorAll('.dropdown-item.toggle').forEach(el => {
+    if (el.classList.contains('disabled')) return;
     const icon = el.querySelector('.bi');
     el.addEventListener('click', () => {
         icon.classList.toggle('bi-circle');
@@ -160,41 +177,31 @@ document.querySelectorAll('.dropdown-item.toggle').forEach(el => {
     });
 });
 
-document.getElementById('axialTilt').addEventListener('toggle', () =>  Swal.fire({
-        title: 'Ya viene! Estamos trabajando en esto...',
-        confirmButtonText: 'OK!',
-        customClass: {
-            confirmButton: 'btn',
-        }
-    })
-);
-document.getElementById('spin').addEventListener('toggle', () => modelViewer.paused ? modelViewer.play() : modelViewer.pause());
-document.getElementById('center').addEventListener('click', () => {
-    modelViewer.cameraTarget = "0m 0m 0m";
-    modelViewer.cameraOrbit = defaultCameraOrbit;
-    modelViewer.fieldOfView = defaultFieldOfView;
-});
-infoButton.addEventListener('click', () => {
-    const innerHTML = `<div><p><strong>Masa:</strong> ${selectedBodyData.mass}</p>
-    <p><strong>Radio:</strong> ${selectedBodyData.radius}</p>
-    <p><strong>Período de Rotación:</strong> ${selectedBodyData.rotationTime}</p>` +
-    (selectedBodyData.revolutionTime ? `<p><strong>Período de Revolución:</strong> ${selectedBodyData.revolutionTime}</p>` : '') +
-    '</div>';
-    console.log(innerHTML);
-    Swal.fire({
-        title: selectedBodyData.name,
-        html: innerHTML,
-        confirmButtonText: 'OK!',
-        customClass: {
-            confirmButton: 'btn',
-        }
-    })
-});
+// Model Change
+document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.addEventListener('click', () => {
+    // Unselect selected
+    document.querySelector('#celestialBodies .dropdown-item.active')?.classList.remove('active');
+    // Select myself and change model
+    el.classList.add('active');
+    wasPaused = modelViewer.paused;
+    loadModel(el.dataset.body);
+}))
+
+// Model Changed Successfully
+modelViewer.addEventListener('load', () => {
+    // Sync state
+    if(wasPaused) modelViewer.pause();
+    defaultCameraOrbit = modelViewer.getCameraOrbit();
+    defaultFieldOfView = modelViewer.getFieldOfView();
+})
+
+// AR
 document.getElementById('viewInAR').addEventListener('click', (e) => {
     if(modelViewer.canActivateAR) {
         modelViewer.querySelector('.ar-button').click();
         return;
     }
+    // If user cannot use AR here, we prompt them to view in mobile device
     Swal.fire({
         title: 'Abrílo en tu celular para verlo en Realidad Aumentada',
         html: '<div id="qr-code"></div>',
@@ -203,7 +210,7 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
             confirmButton: 'btn',
         }
     });
-    const qrcode = new QRCode(document.getElementById('qr-code'), {
+    new QRCode(document.getElementById('qr-code'), {
         text: window.location.href,
         width: 256,
         height: 256,
@@ -211,4 +218,60 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
         colorLight : '#e1e5eb',
         correctLevel : QRCode.CorrectLevel.H
       });
+});
+
+
+document.getElementById('compare').addEventListener('click', (e) => {
+    Swal.fire({
+        title: 'No disponible! Estamos trabajando...',
+        confirmButtonText: 'OK!',
+        customClass: {
+            confirmButton: 'btn',
+        }
+    });
+});
+
+// TODO: Tilt
+document.getElementById('axialTilt').addEventListener('toggle', () =>  console.error("NOT IMPLEMENTED"));
+
+// Spin
+document.getElementById('spin').addEventListener('toggle', () => modelViewer.paused ? modelViewer.play() : modelViewer.pause());
+
+// Center Camera
+document.getElementById('center').addEventListener('click', () => {
+    modelViewer.cameraTarget = "0m 0m 0m";
+    modelViewer.cameraOrbit = defaultCameraOrbit;
+    modelViewer.fieldOfView = defaultFieldOfView;
+});
+
+// Info
+document.getElementById('info').addEventListener('click', () => {
+    const innerHTML = `<div><p><strong>Masa:</strong> ${selectedBody.data.mass}</p>
+    <p><strong>Radio:</strong> ${selectedBody.data.radius}</p>
+    <p><strong>Período de Rotación:</strong> ${selectedBody.data.rotationTime}</p>` +
+    (selectedBody.data.revolutionTime ? `<p><strong>Período de Revolución:</strong> ${selectedBody.data.revolutionTime}</p>` : '') +
+    '</div>';
+    Swal.fire({
+        title: selectedBody.data.name,
+        html: innerHTML,
+        confirmButtonText: 'OK!',
+        customClass: {
+            confirmButton: 'btn',
+        }
+    })
+});
+
+// Map 
+document.getElementById('map').addEventListener('click', () => {
+    const innerHTML = `<img  class="map-image" src="${selectedBody.mapImage}"/>`;
+    
+    Swal.fire({
+        title: `Mapa de ${selectedBody.data.name}`,
+        html: innerHTML,
+        confirmButtonText: 'OK!',
+        customClass: {
+            container: 'map-modal',
+            confirmButton: 'btn',
+        }
+    })
 });

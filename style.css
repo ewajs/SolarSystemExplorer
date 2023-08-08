@@ -34,6 +34,10 @@ model-viewer .ar-button.btn {
     margin-left: 10px;
 }
 
+.dropdown-menu > li.hide {
+    display: none;
+}
+
 .dropdown .dropdown-item .bi{
     margin-left: 30px;
 }
@@ -43,14 +47,12 @@ model-viewer .ar-button.btn {
     pointer-events: unset;
 }
 
-
 .menu-container .dropend > .dropdown-toggle,
 .menu-container .dropdown > .dropdown-toggle  {
     color: rgb(222, 226, 230);
     display: flex;
     justify-content: space-between;
     padding: 4px 16px;
-   
 }
 
 .menu-container .dropend {
@@ -124,4 +126,26 @@ model-viewer .ar-button.btn {
 
 .swal2-container > .swal2-modal .swal2-html-container p {
     color: white;
+}
+
+/* Map Modal */
+
+.swal2-container.map-modal > .swal2-modal {
+    max-width: 90%;
+    max-height: 90%;
+    width: unset;
+}
+
+.swal2-container.map-modal > .swal2-modal img.map-image {
+    width: 100%;
+}
+
+@media only screen and (max-width: 600px) {
+    .swal2-container.map-modal > .swal2-modal {
+        max-width: 100%;
+    }
+
+    .swal2-container.map-modal > .swal2-modal > .swal2-html-container {
+        margin: 20px 0;
+    }
 }
