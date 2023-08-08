@@ -126,16 +126,38 @@ const modelViewer = document.querySelector('model-viewer');
 //// State
 let selectedBody = bodiesToModels.earth;
 let wasPaused = false;
-let defaultCameraOrbit, defaultFieldOfView;
+let defaultCameraOrbit, defaultFieldOfView, loaderTimeout;
 
 //// State Updaters
 function loadModel(body) {
     selectedBody = bodiesToModels[body];
-    modelViewer.src = selectedBody.model;
     const params = new URLSearchParams();
     // update search params without triggering page load
     params.set('body', body)
     history.pushState(null, '', window.location.pathname + '?' + params.toString());
+    
+    // Start loading new model and defer loader launch
+    modelViewer.src = selectedBody.model;
+    
+    loaderTimeout = setTimeout(() => {
+        console.log("Launching Modal")
+        launchModal('Cargando...');
+        Swal.showLoading();
+    }, 300);
+}
+
+//// Modals
+function launchModal(title, html, container) {
+    closeDropdowns();
+    Swal.fire({
+        title,
+        html,
+        confirmButtonText: 'OK!',
+        customClass: {
+            container,
+            confirmButton: 'btn',
+        }
+    })
 }
 
 //// Events
@@ -145,11 +167,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Read from URL or default to earth if empty or invalid
     const queryBody = params.get('body') ?? 'earth';
     const body = bodiesToModels[queryBody] ? queryBody :'earth';
+    // Unselect selected
+    document.querySelector('#celestialBodies .dropdown-item.active')?.classList.remove('active');
+    // Select myself and change model
+    document.querySelector(`#celestialBodies .dropdown-item[data-body="${body}"]`).classList.add('active');
     // Load from Map and default to earth if not found
     loadModel(body);
 })
+const dropdowns = document.querySelectorAll('.dropdown, .dropend');
+function closeDropdowns() {
+    dropdowns.forEach(dropdown => new bootstrap.Dropdown(dropdown).hide())
+}
 // Dropdowns (General Behavior) 
-document.querySelectorAll('.dropdown, .dropend').forEach(dropdown => {
+dropdowns.forEach(dropdown => {
     const toggle = dropdown.querySelector('.dropdown-toggle > .bi');
     // Active Icon
     dropdown.addEventListener('shown.bs.dropdown', (e) => {
@@ -185,6 +215,7 @@ document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.ad
     el.classList.add('active');
     wasPaused = modelViewer.paused;
     loadModel(el.dataset.body);
+    closeDropdowns();
 }))
 
 // Model Changed Successfully
@@ -193,6 +224,9 @@ modelViewer.addEventListener('load', () => {
     if(wasPaused) modelViewer.pause();
     defaultCameraOrbit = modelViewer.getCameraOrbit();
     defaultFieldOfView = modelViewer.getFieldOfView();
+    // Clear launching of modal and close if needed
+    clearTimeout(loaderTimeout);
+    Swal.close();
 })
 
 // AR
@@ -202,14 +236,11 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
         return;
     }
     // If user cannot use AR here, we prompt them to view in mobile device
-    Swal.fire({
-        title: 'Abrílo en tu celular para verlo en Realidad Aumentada',
-        html: '<div id="qr-code"></div>',
-        confirmButtonText: 'OK!',
-        customClass: {
-            confirmButton: 'btn',
-        }
-    });
+    launchModal(
+        'Abrílo en tu celular para verlo en Realidad Aumentada',
+        '<div id="qr-code"></div>',
+    );
+
     new QRCode(document.getElementById('qr-code'), {
         text: window.location.href,
         width: 256,
@@ -220,16 +251,8 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
       });
 });
 
-
-document.getElementById('compare').addEventListener('click', (e) => {
-    Swal.fire({
-        title: 'No disponible! Estamos trabajando...',
-        confirmButtonText: 'OK!',
-        customClass: {
-            confirmButton: 'btn',
-        }
-    });
-});
+// TODO: Compare Switch Model
+document.getElementById('compare').addEventListener('click', () => launchModal('No disponible! Estamos trabajando...'));
 
 // TODO: Tilt
 document.getElementById('axialTilt').addEventListener('toggle', () =>  console.error("NOT IMPLEMENTED"));
@@ -251,29 +274,13 @@ document.getElementById('info').addEventListener('click', () => {
     <p><strong>Período de Rotación:</strong> ${selectedBody.data.rotationTime}</p>` +
     (selectedBody.data.revolutionTime ? `<p><strong>Período de Revolución:</strong> ${selectedBody.data.revolutionTime}</p>` : '') +
     '</div>';
-    Swal.fire({
-        title: selectedBody.data.name,
-        html: innerHTML,
-        confirmButtonText: 'OK!',
-        customClass: {
-            confirmButton: 'btn',
-        }
-    })
+    launchModal(selectedBody.data.name, innerHTML);
 });
 
 // Map 
 document.getElementById('map').addEventListener('click', () => {
     const innerHTML = `<img  class="map-image" src="${selectedBody.mapImage}"/>`;
-    
-    Swal.fire({
-        title: `Mapa de ${selectedBody.data.name}`,
-        html: innerHTML,
-        confirmButtonText: 'OK!',
-        customClass: {
-            container: 'map-modal',
-            confirmButton: 'btn',
-        }
-    })
+    launchModal(`Mapa de ${selectedBody.data.name}`, innerHTML, 'map-modal');
 });
 
 // Help 
@@ -294,14 +301,34 @@ document.getElementById('help').addEventListener('click', () => {
         <p class="credit"><strong>Hecho por:</strong> <a href="https://github.com/ewajs" target="_blank">Ezequiel Wajs</a></p>
         <p class="credit"><strong>Asesoría Modelado y 3D:</strong> <a href="https://www.imdb.com/name/nm9137925/" target="_blank">Lionel Cornistein</a></p>
     `;
-    
-    Swal.fire({
-        title: `Ayuda`,
-        html: innerHTML,
-        confirmButtonText: 'OK!',
-        customClass: {
-            container: 'help-modal',
-            confirmButton: 'btn',
-        }
-    })
+    launchModal('Ayuda', innerHTML, 'help-modal');
 });
+
+// Share
+document.getElementById('share').addEventListener('click', (e) => {
+    const shareData = {
+        title: "Explorador del Sistema Solar",
+        text: "Explorá el sistema solar!",
+        url: window.location.href,
+      };
+    // If device has sharing enabled, we trigger native share
+    if (navigator.canShare && navigator.canShare(shareData)) {
+        navigator.share(shareData);
+        return;
+    }
+    // Otherwhise modal with a link + QR
+     // If user cannot use AR here, we prompt them to view in mobile device
+     launchModal(
+        'Compartir',
+        '<div id="qr-code"></div>',
+    );
+
+    new QRCode(document.getElementById('qr-code'), {
+        text: window.location.href,
+        width: 256,
+        height: 256,
+        colorDark : '#202327',
+        colorLight : '#e1e5eb',
+        correctLevel : QRCode.CorrectLevel.H
+      });
+})
