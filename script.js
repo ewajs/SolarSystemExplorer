@@ -128,6 +128,42 @@ const bodiesToModels = {
             rotationTime: '25 días',
         } 
     },
+    earth_jupiter: { 
+        model: './models/jupiter_earth.glb',
+        mapImage: './textures/2k_sun.jpg',
+        axialTilt: 0,
+        retrograde: false, 
+        data:  {
+            name: 'Sol',
+            mass: '1.99×10^30 kg / 332.950 Tierras',
+            radius: '696.342 km / 109 Tierras',
+            rotationTime: '25 días',
+        } 
+    },
+    earth_mars: { 
+        model: './models/mars_earth.glb',
+        mapImage: './textures/2k_sun.jpg',
+        axialTilt: 0,
+        retrograde: false, 
+        data:  {
+            name: 'Sol',
+            mass: '1.99×10^30 kg / 332.950 Tierras',
+            radius: '696.342 km / 109 Tierras',
+            rotationTime: '25 días',
+        } 
+    },
+    earth_moon: { 
+        model: './models/moon_earth.glb',
+        mapImage: './textures/2k_sun.jpg',
+        axialTilt: 0,
+        retrograde: false, 
+        data:  {
+            name: 'Sol',
+            mass: '1.99×10^30 kg / 332.950 Tierras',
+            radius: '696.342 km / 109 Tierras',
+            rotationTime: '25 días',
+        } 
+    },
 }
 
 //// Global References
