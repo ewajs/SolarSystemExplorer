@@ -271,7 +271,13 @@ modelViewer.addEventListener('load', () => {
     if(isPaused) modelViewer.pause();
     modelViewer.orientation = `${isTilted ? -selectedBody.axialTilt : 0}deg 0deg 0deg`;
     modelViewer.timeScale = selectedBody.retrograde && !isCompared ? -1 : 1;
-    defaultCameraOrbit = modelViewer.getCameraOrbit();
+    // For wide screens add a bit of zoom out
+    if (window.innerWidth > window.innerHeight) {
+        modelViewer.cameraOrbit = 'auto auto 130%';
+        defaultCameraOrbit = 'auto auto 130%';    
+    } else {
+        defaultCameraOrbit = modelViewer.getCameraOrbit();
+    }
     defaultFieldOfView = modelViewer.getFieldOfView();
     // Clear launching of modal and close if needed
     clearTimeout(loaderTimeout);
