@@ -356,15 +356,23 @@ document.getElementById('help').addEventListener('click', () => {
         <p><strong>Mover Modelo: </strong> Deslizar</p>
         <p><strong>Rotar Modelo: </strong> Dos dedos + Rotar</p>
         <p><strong>Zoomear Modelo: </strong> Pellizcar</p>
-        <h2>Créditos</h2>
-        <p class="credit"><strong>Texturas Cuerpos Celestes:</strong> <a href="https://www.solarsystemscope.com/textures/" target="_blank">Solar Textures</a></p>
-        <p class="credit"><strong>Modelado 3D hecho con:</strong> <a href="https://www.blender.org/" target="_blank">Blender</a></p>
-        <p class="credit"><strong>Información Astronómica:</strong> <a href="https://www.wikipedia.org/" target="_blank">Wikipedia</a></p>
-        <p class="credit"><strong>Hecho por:</strong> <a href="https://github.com/ewajs" target="_blank">Ezequiel Wajs</a></p>
-        <p class="credit"><strong>Asesoría Modelado y 3D:</strong> <a href="https://www.imdb.com/name/nm9137925/" target="_blank">Lionel Cornistein</a></p>
     `;
     launchModal('Ayuda', innerHTML, 'help-modal');
 });
+
+// Credits
+document.getElementById('credits').addEventListener('click', () => {
+    const innerHTML = `
+        <p><strong>Texturas Cuerpos Celestes:</strong> <a href="https://www.solarsystemscope.com/textures/" target="_blank">Solar Textures</a></p>
+        <p><strong>Modelado 3D hecho con:</strong> <a href="https://www.blender.org/" target="_blank">Blender</a></p>
+        <p><strong>Información Astronómica:</strong> <a href="https://www.wikipedia.org/" target="_blank">Wikipedia</a></p>
+        <p><strong>Código, modelos y texturas (Open Source):</strong> <a href="https://github.com/ewajs/SolarSystemExplorer" target="_blank">GitHub</a></p>
+        <p><strong>Idea y Desarrollo:</strong> <a href="https://github.com/ewajs" target="_blank">Ezequiel Wajs</a></p>
+        <p><strong>Asesoría Modelado y 3D:</strong> <a href="https://www.imdb.com/name/nm9137925/" target="_blank">Lionel Cornistein</a></p>
+    `;
+    launchModal('Créditos', innerHTML, 'help-modal');
+});
+
 
 // Share
 document.getElementById('share').addEventListener('click', (e) => {
