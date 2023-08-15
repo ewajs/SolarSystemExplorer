@@ -324,7 +324,7 @@ document.getElementById('spin').addEventListener('toggle', () => modelViewer.pau
 
 // Center Camera
 document.getElementById('center').addEventListener('click', () => {
-    modelViewer.cameraTarget = "0m 0m 0m";
+    modelViewer.cameraTarget = "auto auto auto";
     modelViewer.cameraOrbit = defaultCameraOrbit;
     modelViewer.fieldOfView = defaultFieldOfView;
 });
