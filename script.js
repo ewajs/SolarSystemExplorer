@@ -2,6 +2,7 @@
 const bodiesToModels = {
     earth: { 
         model: './models/earth.glb',
+        compared_model: null,
         mapImage: './textures/2k_earth.jpg',
         axialTilt: 23.4, 
         retrograde: false,
@@ -15,6 +16,7 @@ const bodiesToModels = {
     },
     moon: { 
         model: './models/moon.glb',
+        compared_model: './models/moon_earth.glb',
         mapImage: './textures/2k_moon.jpg',
         axialTilt: 1.5, 
         retrograde: false,
@@ -28,6 +30,7 @@ const bodiesToModels = {
     },
     mercury: { 
         model: './models/mercury.glb',
+        compared_model: './models/mercury_earth.glb',
         mapImage: './textures/2k_mercury.jpg',
         axialTilt: 2,
         retrograde: false, 
@@ -35,12 +38,13 @@ const bodiesToModels = {
             name: 'Mercurio',
             mass: '3,30×10^23 kg / 0.06 Tierras',
             radius: '2.439 km / 0.38 Tierras',
-            rotationTime: '87.96 días',
-            revolutionTime: '58.64 días',
+            rotationTime: '58.64 días',
+            revolutionTime: '87.96 días',
         }
     },
     venus: { 
         model: './models/venus.glb',
+        compared_model: './models/venus_earth.glb',
         mapImage: './textures/2k_venus.jpg',
         axialTilt: 177.4, 
         retrograde: true,
@@ -54,6 +58,7 @@ const bodiesToModels = {
     },
     mars: { 
         model: './models/mars.glb',
+        compared_model: './models/mars_earth.glb',
         mapImage: './textures/2k_mars.jpg',
         retrograde: false,
         axialTilt: 25.2, 
@@ -67,6 +72,7 @@ const bodiesToModels = {
     },
     jupiter: { 
         model: './models/jupiter.glb',
+        compared_model: './models/jupiter_earth.glb',
         mapImage: './textures/2k_jupiter.jpg',
         retrograde: false,
         axialTilt: 3.3, 
@@ -80,6 +86,7 @@ const bodiesToModels = {
     },
     saturn: { 
         model: './models/saturn.glb',
+        compared_model: './models/saturn_earth.glb',
         mapImage: './textures/2k_saturn.jpg',
         axialTilt: 26.7, 
         retrograde: false,
@@ -92,6 +99,7 @@ const bodiesToModels = {
         }  },
     uranus: { 
         model: './models/uranus.glb',
+        compared_model: './models/uranus_earth.glb',
         mapImage: './textures/2k_uranus.jpg',
         axialTilt: 97.8,
         retrograde: true, 
@@ -105,6 +113,7 @@ const bodiesToModels = {
     },
     neptune: { 
         model: './models/neptune.glb',
+        compared_model: './models/neptune_earth.glb',
         mapImage: './textures/2k_neptune.jpg',
         axialTilt: 28.3,
         retrograde: false, 
@@ -118,44 +127,9 @@ const bodiesToModels = {
     },
     sun: { 
         model: './models/sun.glb',
+        compared_model: './models/sun_earth.glb',
         mapImage: './textures/2k_sun.jpg',
         axialTilt: 7.25,
-        retrograde: false, 
-        data:  {
-            name: 'Sol',
-            mass: '1.99×10^30 kg / 332.950 Tierras',
-            radius: '696.342 km / 109 Tierras',
-            rotationTime: '25 días',
-        } 
-    },
-    earth_jupiter: { 
-        model: './models/jupiter_earth.glb',
-        mapImage: './textures/2k_sun.jpg',
-        axialTilt: 0,
-        retrograde: false, 
-        data:  {
-            name: 'Sol',
-            mass: '1.99×10^30 kg / 332.950 Tierras',
-            radius: '696.342 km / 109 Tierras',
-            rotationTime: '25 días',
-        } 
-    },
-    earth_mars: { 
-        model: './models/mars_earth.glb',
-        mapImage: './textures/2k_sun.jpg',
-        axialTilt: 0,
-        retrograde: false, 
-        data:  {
-            name: 'Sol',
-            mass: '1.99×10^30 kg / 332.950 Tierras',
-            radius: '696.342 km / 109 Tierras',
-            rotationTime: '25 días',
-        } 
-    },
-    earth_moon: { 
-        model: './models/moon_earth.glb',
-        mapImage: './textures/2k_sun.jpg',
-        axialTilt: 0,
         retrograde: false, 
         data:  {
             name: 'Sol',
@@ -168,10 +142,12 @@ const bodiesToModels = {
 
 //// Global References
 const modelViewer = document.querySelector('model-viewer');
+const compareBtn = document.getElementById('compare');
+const axialTiltBtn = document.getElementById('axialTilt');
 
 //// State
 let selectedBody = bodiesToModels.earth;
-let isPaused = false, isTilted = false;
+let isPaused = false, isTilted = false, isCompared = false;
 let defaultCameraOrbit, defaultFieldOfView, loaderTimeout;
 
 //// State Updaters
@@ -182,15 +158,29 @@ function loadModel(body) {
     // update search params without triggering page load
     params.set('body', body)
     history.pushState(null, '', window.location.pathname + '?' + params.toString());
-    
+    changeModel(!isCompared ? selectedBody.model : selectedBody.compared_model);
+}
+
+function changeModel(modelUrl) {
     // Start loading new model and defer loader launch
-    modelViewer.src = selectedBody.model;
-    
+    modelViewer.src = modelUrl;
+
     loaderTimeout = setTimeout(() => {
         console.log("Launching Modal")
         launchModal('Cargando...');
         Swal.showLoading();
     }, 300);
+}
+
+function disableToggle(toggleEl) {
+    toggleEl.classList.add('disabled');
+    const bi = toggleEl.querySelector('.bi');
+    bi.classList.remove('bi-check-circle-fill');
+    bi.classList.add('bi-circle');
+}
+
+function enableToggle(toggleEl) {
+    toggleEl.classList.remove('disabled');
 }
 
 //// Modals
@@ -214,6 +204,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Read from URL or default to earth if empty or invalid
     const queryBody = params.get('body') ?? 'earth';
     const body = bodiesToModels[queryBody] ? queryBody :'earth';
+    // Enable comparison for anything other than earth on load
+    if (body !== 'earth') enableToggle(compareBtn);
     // Unselect selected
     document.querySelector('#celestialBodies .dropdown-item.active')?.classList.remove('active');
     // Select myself and change model
@@ -245,9 +237,9 @@ dropdowns.forEach(dropdown => {
 
 // Toggles (General Behavior)
 document.querySelectorAll('.dropdown-item.toggle').forEach(el => {
-    if (el.classList.contains('disabled')) return;
     const icon = el.querySelector('.bi');
     el.addEventListener('click', () => {
+        if (el.classList.contains('disabled')) return;
         icon.classList.toggle('bi-circle');
         icon.classList.toggle('bi-check-circle-fill');
         el.dispatchEvent(new CustomEvent('toggle', {detail: icon.classList.contains('bi-check-circle-fill')}));
@@ -261,6 +253,14 @@ document.querySelectorAll('#celestialBodies .dropdown-item').forEach(el => el.ad
     // Select myself and change model
     el.classList.add('active');
     isPaused = modelViewer.paused;
+    // On earth selection disable comparing bodies and axial tilt
+    if(el.dataset.body === 'earth') {
+        isCompared = false;
+        disableToggle(compareBtn);
+        enableToggle(axialTiltBtn);
+    } else {
+        enableToggle(compareBtn);
+    }
     loadModel(el.dataset.body);
     closeDropdowns();
 }))
@@ -270,7 +270,7 @@ modelViewer.addEventListener('load', () => {
     // Sync state
     if(isPaused) modelViewer.pause();
     modelViewer.orientation = `${isTilted ? -selectedBody.axialTilt : 0}deg 0deg 0deg`;
-    modelViewer.timeScale = selectedBody.retrograde ? -1 : 1;
+    modelViewer.timeScale = selectedBody.retrograde && !isCompared ? -1 : 1;
     defaultCameraOrbit = modelViewer.getCameraOrbit();
     defaultFieldOfView = modelViewer.getFieldOfView();
     // Clear launching of modal and close if needed
@@ -300,14 +300,24 @@ document.getElementById('viewInAR').addEventListener('click', (e) => {
       });
 });
 
-// TODO: Compare Switch Model
-document.getElementById('compare').addEventListener('click', () => launchModal('No disponible! Estamos trabajando...'));
+// Compare Switch Model
+compareBtn.addEventListener('toggle', (e) => {
+    isCompared = e.detail;
+    changeModel(!isCompared ? selectedBody.model : selectedBody.compared_model);
+    if(isCompared) {
+        isTilted = false;
+        disableToggle(axialTiltBtn);
+    } else {
+        enableToggle(axialTiltBtn);
+    }
+});
 
 // Axial Tilt
-document.getElementById('axialTilt').addEventListener('toggle', (e) => {
+axialTiltBtn.addEventListener('toggle', (e) => {
     isTilted = e.detail;
     modelViewer.orientation = `${isTilted ? -selectedBody.axialTilt : 0}deg 0deg 0deg`;
 });
+
 
 // Spin
 document.getElementById('spin').addEventListener('toggle', () => modelViewer.paused ? modelViewer.play() : modelViewer.pause());
